@@ -11,7 +11,8 @@ from ROAR.agent_module.agent import Agent
 from typing import Tuple
 import json
 from pathlib import Path
-
+from ROAR.agent_module.turn_slowdown import SlowdownHandler
+current_error = 0.0
 
 class PIDController(Controller):
     def __init__(self, agent, steering_boundary: Tuple[float, float],
@@ -21,6 +22,10 @@ class PIDController(Controller):
         self.throttle_boundary = throttle_boundary
         self.steering_boundary = steering_boundary
         self.config = json.load(Path(agent.agent_settings.pid_config_file_path).open(mode='r'))
+        self.handler = SlowdownHandler()
+        self.max_speed = 60.0
+        self.min_speed = 10.0        
+        print(self.max_speed)
         self.long_pid_controller = LongPIDController(agent=agent,
                                                      throttle_boundary=throttle_boundary,
                                                      max_speed=self.max_speed,
@@ -33,9 +38,12 @@ class PIDController(Controller):
         self.logger = logging.getLogger(__name__)
 
     def run_in_series(self, next_waypoint: Transform, **kwargs) -> VehicleControl:
-        throttle = self.long_pid_controller.run_in_series(next_waypoint=next_waypoint,
-                                                          target_speed=kwargs.get("target_speed", self.max_speed))
+        throttle, self.turning_aggression = self.handler.check_pos(self.agent.vehicle.transform.location.to_array())
         steering = self.lat_pid_controller.run_in_series(next_waypoint=next_waypoint)
+        self.long_pid_controller.receive_aggression_value(self.turning_aggression)
+        self.lat_pid_controller.receive_aggression_value(self.turning_aggression)
+        print(throttle)
+        print(self.turning_aggression)
         return VehicleControl(throttle=throttle, steering=steering)
 
     @staticmethod
@@ -61,10 +69,15 @@ class LongPIDController(Controller):
 
         self._dt = dt
 
+    def receive_aggression_value(self, agg):
+        self._dt = agg
+        print(self._dt)
+
     def run_in_series(self, next_waypoint: Transform, **kwargs) -> float:
         target_speed = min(self.max_speed, kwargs.get("target_speed", self.max_speed))
         current_speed = Vehicle.get_speed(self.agent.vehicle)
-
+        if current_speed > self.max_speed:
+            current_speed = self.max_speed
         k_p, k_d, k_i = PIDController.find_k_values(vehicle=self.agent.vehicle, config=self.config)
         error = target_speed - current_speed
 
@@ -93,6 +106,10 @@ class LatPIDController(Controller):
         self.steering_boundary = steering_boundary
         self._error_buffer = deque(maxlen=10)
         self._dt = dt
+
+    def receive_aggression_value(self, agg):
+        self._dt = agg
+        print(self._dt)
 
     def run_in_series(self, next_waypoint: Transform, **kwargs) -> float:
         """

@@ -26,16 +26,16 @@ class VehicleControl(BaseModel):
         Cap it between -1  and 1
         :return:
         """
-        return self.clamp(self.steering, -1, 1)
+        return self.clamp(self.steering, -3, 3)
 
     def to_array(self) -> np.ndarray:
         return np.array([self.throttle, self.steering])
 
     def record(self):
-        return f"{self.brake},{round(self.throttle, 3)},{round(self.steering, 3)}"
+        return f"{self.brake},{round(self.throttle, 3)},{round(self.steering, 6)}"
 
     def __str__(self):
-        return f"Brake: {self.brake}, Throttle: {round(self.throttle, 3)}, Steering: {round(self.steering, 3)}"
+        return f"Brake: {self.brake}, Throttle: {round(self.throttle, 3)}, Steering: {round(self.steering, 6)}"
 
     @staticmethod
     def fromBytes(data: bytes):

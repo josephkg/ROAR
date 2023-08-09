@@ -11,12 +11,14 @@ import logging
 
 
 class PIDAgent(Agent):
-    def __init__(self, target_speed=40, **kwargs):
+    def __init__(self, target_speed=10, **kwargs):
         super().__init__(**kwargs)
         self.target_speed = target_speed
+        print(self.target_speed)
         self.logger = logging.getLogger("PID Agent")
         self.route_file_path = Path(self.agent_settings.waypoint_file_path)
-        self.pid_controller = PIDController(agent=self, steering_boundary=(-1, 1), throttle_boundary=(0, 1))
+        print(self.route_file_path)
+        self.pid_controller = PIDController(agent=self, steering_boundary=(-2, 2), throttle_boundary=(0, 1))
         self.mission_planner = WaypointFollowingMissionPlanner(agent=self)
         # initiated right after mission plan
 
@@ -36,5 +38,8 @@ class PIDAgent(Agent):
         super(PIDAgent, self).run_step(vehicle=vehicle,
                                        sensors_data=sensors_data)
         self.transform_history.append(self.vehicle.transform)
+        self.current_location = self.vehicle.transform.location.to_array()
+        #self.max_boundary is the current throttle
+        #i'm trying to set a new value for the throttle but it keeps resetting to 1
         control = self.local_planner.run_in_series()
         return control

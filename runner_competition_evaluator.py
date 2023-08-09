@@ -10,6 +10,9 @@ from typing import Tuple
 from prettytable import PrettyTable
 from ROAR.agent_module.michael_pid_agent import PIDAgent
 
+'''Paste this to load environment:   conda activate ROAR_major 
+cd ROAR'''
+#run this: python runner_competition_evaluator.py
 
 def compute_score(carla_runner: CarlaRunner) -> Tuple[float, int, int]:
     """

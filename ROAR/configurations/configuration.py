@@ -50,7 +50,7 @@ class Configuration(BaseModel):
     # data path
     waypoint_file_path: str = Field(default=(Path(
         os.getcwd()) / "data" / "easy_map_waypoints.txt").as_posix())
-
+    print(waypoint_file_path)
     json_waypoint_file_path: str = Field(default=(Path(
         os.getcwd()) / "data" / "easy_map_waypoints.json").as_posix())
 
@@ -73,7 +73,7 @@ class Configuration(BaseModel):
         description="This variable is used to intialize the Occupancy grid map."
                     "The bigger it is, the more impact it is going to have on the runtime computation"
                     "However, if it is smaller than the actual map, some weird things can happen")
-    target_speed: int = 80
+    target_speed: int = 20
     pid_config_file_path: str = Field(default="./ROAR_Sim/configurations/pid_config.json")
     pid_config: dict = Field(
         default={
@@ -89,5 +89,5 @@ class Configuration(BaseModel):
 
     simple_waypoint_local_planner_config_file_path: str = \
         Field(default="./ROAR_Sim/configurations/simple_waypoint_local_planner_config.json")
-    max_speed: float = Field(default=200, description="maximum speed in which the vehicle can drive at")
+    max_speed: float = 60.0
     num_laps: int = Field(default=1, description="Number of laps to run for")
