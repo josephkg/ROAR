@@ -3,7 +3,7 @@ class SlowdownHandler():
         self.slowdown_index = [0]
         self.throttle_index = [0]
         self.has_iterated = [False]
-        self.current_throttle = [0.75, 0.03]
+        self.current_throttle = [0.8, 0.03]
         #Read list of positions
         turn_txt_file = open("slowdown_points.txt", "r")
         thr_txt_file = open("speedup_points.txt", "r")
@@ -46,7 +46,7 @@ class SlowdownHandler():
                     self.throttle_index[0] += 1
                     self.has_iterated[0] == False
                 print("in throttle region range")
-                self.current_throttle[0] = 0.75
+                self.current_throttle[0] = 0.8
                 self.current_throttle[1] = 0.03
         return self.current_throttle[0], self.current_throttle[1]   
                   
