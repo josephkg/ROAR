@@ -101,6 +101,7 @@
   "spawn_point_id": 0,
   "show_sensors_data": true,
   "save_sensor_data": false,
-  "max_speed": 110
+  "max_speed": 90,
+  "min_speed": 20
 }
 

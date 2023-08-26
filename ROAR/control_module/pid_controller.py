@@ -12,20 +12,20 @@ from typing import Tuple
 import json
 from pathlib import Path
 from ROAR.agent_module.turn_slowdown import SlowdownHandler
-current_error = 0.0
 
 class PIDController(Controller):
     def __init__(self, agent, steering_boundary: Tuple[float, float],
                  throttle_boundary: Tuple[float, float], **kwargs):
         super().__init__(agent, **kwargs)
         self.max_speed = self.agent.agent_settings.max_speed
+        #self.min_speed = self.agent.agent_settings.min_speed
         self.throttle_boundary = throttle_boundary
         self.steering_boundary = steering_boundary
         self.config = json.load(Path(agent.agent_settings.pid_config_file_path).open(mode='r'))
         self.handler = SlowdownHandler()
-        self.max_speed = 60.0
-        self.min_speed = 10.0        
+        self.has_broken_min = [False]
         print(self.max_speed)
+        #print(self.min_speed)
         self.long_pid_controller = LongPIDController(agent=agent,
                                                      throttle_boundary=throttle_boundary,
                                                      max_speed=self.max_speed,
@@ -42,8 +42,11 @@ class PIDController(Controller):
         steering = self.lat_pid_controller.run_in_series(next_waypoint=next_waypoint)
         self.long_pid_controller.receive_aggression_value(self.turning_aggression)
         self.lat_pid_controller.receive_aggression_value(self.turning_aggression)
-        print(throttle)
-        print(self.turning_aggression)
+        self.c_speed = Vehicle.get_speed(self.agent.vehicle)
+        '''if self.c_speed >= self.min_speed:
+            self.has_broken_min[0] = True'''
+        print(self.c_speed)
+        print(self.has_broken_min[0])
         return VehicleControl(throttle=throttle, steering=steering)
 
     @staticmethod
