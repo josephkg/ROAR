@@ -4,6 +4,7 @@ class SlowdownHandler():
         self.throttle_index = [0]
         self.has_iterated = [False]
         self.rg_iterated = [False]
+        self.osh_iterated = [False]
         self.current_throttle = [0.8, 0.03]
         self.throttle_in_region = [0.8, 0.4]
         #Read list of positions
@@ -14,6 +15,8 @@ class SlowdownHandler():
         self.turn_points = []
         self.thr_points = []
         self.rg_points = [2433.98168945, 116.29998779, 3732.32983398]
+        self.position_of_that_one_extremely_steep_hill = [5027.23632812, 321.35913086, 3847.10375977]
+        self.position_of_that_one_extremely_steep_hill_return = [4974.77246094, 325.77496338, 3814.30932617]
         #Split both position lists into separate arrays, then convert position values into float
         for i in range(len(turn_array)):
                 item = turn_array[i]
@@ -51,6 +54,7 @@ class SlowdownHandler():
                 print("in throttle region range")
                 self.current_throttle[0] = self.throttle_in_region[0]
                 self.current_throttle[1] = 0.04
+        #Crossing regions
         if (current_pos[0] >= self.rg_points[0] - 30 and current_pos[0] <= self.rg_points[0] + 30):
             if (current_pos[2] >= self.rg_points[2] - 30 and current_pos[2] <= self.rg_points[2] + 30):
                     if (self.rg_iterated[0] == False):
@@ -58,6 +62,15 @@ class SlowdownHandler():
                         self.throttle_in_region[0] = 0.8
                         self.throttle_in_region[1] = 0.6
                         self.rg_iterated[0] == True
+        #One steep hill
+        if (current_pos[0] >= self.position_of_that_one_extremely_steep_hill[0] - 30 and current_pos[0] <= self.position_of_that_one_extremely_steep_hill[0] + 30):
+            if (current_pos[2] >= self.position_of_that_one_extremely_steep_hill[2] - 30 and current_pos[2] <= self.position_of_that_one_extremely_steep_hill[2] + 30):
+                print("in steep hill range")
+                self.current_throttle[0] = 0.35
+        if (current_pos[0] >= self.position_of_that_one_extremely_steep_hill_return[0] - 30 and current_pos[0] <= self.position_of_that_one_extremely_steep_hill_return[0] + 30):
+            if (current_pos[2] >= self.position_of_that_one_extremely_steep_hill_return[2] - 30 and current_pos[2] <= self.position_of_that_one_extremely_steep_hill_return[2] + 30):
+                print("in return region range")
+                self.current_throttle[0] = self.throttle_in_region[0]
         return self.current_throttle[0], self.current_throttle[1]   
                   
 
